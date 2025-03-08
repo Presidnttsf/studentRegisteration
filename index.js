@@ -42,6 +42,22 @@ const connectToDatabase = async () => {
 connectToDatabase();
 
 /**
+ * Start the Express server
+ */
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`); // Log message when server starts
+});
+
+
+// home page
+app.get('/', (req, res) => {
+  res.send('Welcome to home page API');
+});
+
+
+
+
+/**
  * Define Mongoose Schema & Model for the "studentsReg" collection
  */
 const studentSchema = new mongoose.Schema({
@@ -74,14 +90,6 @@ app.get('/getstudents', async (req, res) => {
     console.log("Error getting students", error); // Log any errors
     res.status(500).json({ message: "Error getting students" }); // Send error response
   }
-});
-
-
-/**
- * Start the Express server
- */
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`); // Log message when server starts
 });
 
 
