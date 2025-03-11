@@ -95,3 +95,51 @@ A Schema defines the structure of documents in a MongoDB collection. It acts as 
 
 What is a Model?
 A Model is a wrapper around a Schema that allows us to interact with the database for (CRUD operations).
+
+### **Why Do We Need a Mongoose Schema If We Validate in the API?**  
+
+Even if we check for validation inside the `POST` function, we **still need a Mongoose schema**. Here’s why:  
+
+1. **Ensures Data Structure**  
+   - The schema makes sure that the data stored in MongoDB follows a proper structure (e.g., name must be a string).  
+
+2. **Adds Extra Validation**  
+   - Mongoose provides built-in checks like:  
+     - **Type validation** (e.g., name must be a string)  
+     - **Required fields** (e.g., name cannot be empty)  
+     - **Pattern matching** (e.g., name should contain only letters)  
+
+3. **Prevents Bad Data from Entering the Database**  
+   - Even if someone inserts data directly into MongoDB (outside the API), the schema will block invalid entries.  
+
+4. **Supports Default Values & Unique Fields**  
+   - You can set **default values** (e.g., if no profile picture is uploaded, use a default one).  
+   - You can enforce **unique fields** (e.g., prevent duplicate emails).  
+
+### **Can We Skip Schema Validation?**  
+- If we use an external validation library (like `Joi` or `express-validator`) and validate **before inserting into MongoDB**, we can set `{ strict: false }` in Mongoose.  
+- But this is **not recommended** because it makes the database unstructured.  
+
+### **Final Answer:**  
+Even if we validate in the API, **Mongoose schema is still needed** for extra protection and data consistency.
+
+Base URL = www.facebook.com/
+relative URL = /:username/:profile/:setting
+
+Explanation of Parameters
+Base URL (https://www.facebook.com/)
+
+This is the main domain of the website where the API or frontend is hosted.
+It remains constant for all endpoints.
+Relative URL (/:username/:profile/:setting)
+{
+  "username": "alice",
+  "profile": "photos",
+  "setting": "public"
+}
+
+This defines a dynamic route with parameters:
+:username → Represents the user’s name.
+:profile → Represents profile details.
+:setting → Represents a user setting (like privacy, notifications, etc.).
+The : before a word makes it a route parameter, meaning its value changes based on the request.

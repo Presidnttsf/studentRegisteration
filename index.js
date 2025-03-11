@@ -138,3 +138,59 @@ app.post('/addstudent', async (req, res) => {
     }
   });
   
+  // req params dynamic routing
+  app.get('/:name/:email', (req, res) => {
+    console.log("params", req.params)
+    console.log("method", req.method)
+    console.log("URL", req.originalUrl)
+    console.log("headers", req.headers)
+    res.send('Welcome to home page API' + ' ' +   req.params.name + " " + req.params.email);
+    
+  });
+
+
+
+  /**
+ * API Endpoint: PUT /editstudent/:id
+ * Purpose: Updates an existing student's details in the database
+ */
+  app.put('/editstudent/:id', async (req, res) => {
+    try {
+        // Extract student ID from the request parameters
+        const studentId = req.params.id;
+  
+        // Get updated student details from the request body
+        const { name, email, phone, city, gender, courses, password } = req.body;
+  
+        // Step 1: Check if all required fields are provided
+        if (!name || !email || !phone || !city || !gender || !courses || !password) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+  
+        // Step 2: Find the student by ID and update their details
+  //       { new: true } → Returns the updated document instead of the old one.
+  // { runValidators: true } → Ensures validation rules apply to the update.
+        const updatedStudent = await Student.findByIdAndUpdate(
+            studentId,
+            { name, email, phone, city, gender, courses },
+            { new: true, runValidators: true } // Return updated student and ensure validation rules apply
+        );
+  
+        // Step 3: If student not found, return a 404 error
+        if (!updatedStudent) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
+  
+        // Step 4: Send success response with updated student data
+        res.status(200).json({ message: 'Student updated successfully', student: updatedStudent });
+  
+    } catch (error) {
+        // Log the error and send an internal server error response
+        console.error('Error updating student:', error);
+        res.status(500).json({ message: 'Error updating student' });
+    }
+  });
+  
+  
+
+
