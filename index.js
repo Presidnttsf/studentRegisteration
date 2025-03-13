@@ -66,7 +66,7 @@ const studentSchema = new mongoose.Schema({
     required: true,
     match: /^[A-Za-z\s]+$/ // Allows only letters and spaces
   }, // Student's name
-  email: String, // Student's email
+  email: {type: String, unique: true}, // Student's email
   phone: String, // Student's phone number
   city: String, // City where the student lives
   gender: String, // Gender of the student
@@ -84,8 +84,14 @@ const Student = mongoose.model('Student', studentSchema, "studentsReg");
  */
 app.get('/getstudents', async (req, res) => {
   try {
-    const students = await Student.find(); // Retrieve all student records from DB
-    res.json(students); // Send the retrieved data as JSON response
+    const {name, email} = req.query;
+
+   // Create a filter object dynamically based on provided query parameters
+   let filter = {};
+   if(name) filter.name= new RegExp(name,"i");  // Case-insensitive regex search
+   if(email) filter.email= new RegExp(email,"i");
+     const students = await Student.find(filter); // Retrieve all student records from DB
+     res.json(students); // Send the retrieved data as JSON response
   } catch (error) {
     console.log("Error getting students", error); // Log any errors
     res.status(500).json({ message: "Error getting students" }); // Send error response
@@ -93,7 +99,7 @@ app.get('/getstudents', async (req, res) => {
 });
 
 
-// API Endpoint: POST /addstudent
+// API Endpoint: POST /addstudent create new student
 app.post('/addstudent', async (req, res) => {
     try {
       // Get the student details from the request body
@@ -190,6 +196,53 @@ app.post('/addstudent', async (req, res) => {
         res.status(500).json({ message: 'Error updating student' });
     }
   });
+  
+  //insert multiple objects in database
+//this is only for explaination purporse dont run this code
+  async function insertStudents() {
+    try {
+      await Student.insertMany([
+        { name: "Tauseef khan", email: "tsf.khan@gmail.com", phone: "9123456789", city: "Hyderabad", gender: "Male", courses: "Next.js", password: "rohan@123" },
+        
+      ]);
+let count =  await Student.countDocuments();
+      console.log("Data inserted successfully into studentsDb.studentsReg", count);
+    } catch (err) {
+      console.error("Error inserting data:", err);
+    }
+  }
+  
+  // Call the function 
+  //if you want to insert multiple object uncomment the call below
+  // insertStudents();
+
+  //route to delete student
+// Define a DELETE endpoint to delete a student by ID
+app.delete("/deletestudent/:id", async (req, res) => {
+  try {
+    // Extract the student ID from the request parameters
+    const studentId = req.params.id;
+
+    // Find and delete the student document in the database using the ID
+    const deletedStudent = await Student.findByIdAndDelete(studentId);
+
+    // If no student was found with the given ID, return a 404 response
+    if (!deletedStudent) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    // If deletion is successful, send a success response
+    res.status(200).json({ message: "Student deleted successfully" });
+
+  } catch (error) {
+    // Log any errors that occur during the deletion process
+    console.error("Error deleting student:", error);
+
+    // Send a 500 (Internal Server Error) response if something goes wrong
+    res.status(500).json({ message: "Error deleting student" });
+  }
+});
+
   
   
 
