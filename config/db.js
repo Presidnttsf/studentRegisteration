@@ -13,6 +13,7 @@ const connectToDatabase = async () => {
     await mongoose.connect(CONNECTION_STRING, {
       useNewUrlParser: true, // Use new URL parser to avoid deprecation warnings
       useUnifiedTopology: true, // Use new Server Discovery and Monitoring engine
+      useBigInt64: false,  // Explicitly disable useBigInt64 option to fix deserialization issue
     });
     console.log("Connected to database");
   } catch (error) {
