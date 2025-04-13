@@ -7,11 +7,29 @@ const studentRoutes = require('./routes/studentRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:5173',             // local
+  // 'https://your-frontend-url.com',     // your deployed frontend (e.g., Netlify/Vercel)
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
+
+app.options('*', cors());
+
+// JSON parser
 app.use(express.json());
 
-// Database connection
+// DB connection
 connectToDatabase();
 
 // Routes
@@ -22,7 +40,7 @@ app.get('/', (req, res) => {
   res.send('Welcome to the API');
 });
 
-// Start server
+// Server start
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
