@@ -7,7 +7,8 @@ const studentSchema = new mongoose.Schema({
     name: { 
       type: String, 
       required: true,
-      match: /^[A-Za-z\s]+$/ // Allows only letters and spaces
+      match: /^[A-Za-z0-9\s]+$/
+      // Allows only letters and spaces
     }, // Student's name
     email: {type: String, unique: true}, // Student's email
     phone: String, // Student's phone number
